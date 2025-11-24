@@ -17,6 +17,13 @@ QUANTUM_STATES = ["SUPERPOSITION", "ENTANGLED", "COLLAPSED", "DECOHERENT"]
 CRYPTO_SYMBOLS = ["BTC", "ETH", "DOGE", "SHIB", "ADA", "SOL", "MATIC", "AVAX"]
 TRADING_ACTIONS = ["HODL", "BUY_THE_DIP", "MOON_SHOT", "PANIC_SELL", "QUANTUM_LEAP"]
 
+# Trading configuration constants
+MIN_PRICE = 0.01  # Minimum price threshold to prevent negative/zero prices
+MIN_TRADE_SIZE = 0.05  # Minimum 5% of cash per trade
+MAX_TRADE_SIZE = 0.2  # Maximum 20% of cash per trade
+MIN_SELL_PERCENT = 0.3  # Minimum 30% to sell on panic
+MAX_SELL_PERCENT = 0.8  # Maximum 80% to sell on panic
+
 
 class QuantumCryptoTrader:
     """
@@ -70,7 +77,7 @@ class QuantumCryptoTrader:
             print(f"🌊 QUANTUM WAVE DETECTED FOR {symbol}! 🌊")
         
         # Ensure price remains positive even with maximum chaos
-        return max(0.01, base * (1 + quantum_noise))
+        return max(MIN_PRICE, base * (1 + quantum_noise))
     
     def superposition_strategy_analysis(self, symbol: str, price: float) -> List[Tuple[str, float]]:
         """
@@ -149,7 +156,7 @@ class QuantumCryptoTrader:
         Execute a trade based on quantum-collapsed decision.
         ⚠️ SIMULATED TRADES ONLY - NO REAL MONEY! ⚠️
         """
-        trade_amount = self.cash * random.uniform(0.05, 0.2)  # Risk 5-20% per trade
+        trade_amount = self.cash * random.uniform(MIN_TRADE_SIZE, MAX_TRADE_SIZE)
         
         if action in ["BUY_THE_DIP", "MOON_SHOT", "QUANTUM_LEAP"]:
             if self.cash >= trade_amount:
@@ -172,7 +179,7 @@ class QuantumCryptoTrader:
                 
         elif action == "PANIC_SELL":
             if self.portfolio[symbol] > 0:
-                coins = self.portfolio[symbol] * random.uniform(0.3, 0.8)  # Sell 30-80%
+                coins = self.portfolio[symbol] * random.uniform(MIN_SELL_PERCENT, MAX_SELL_PERCENT)
                 revenue = coins * price
                 self.portfolio[symbol] -= coins
                 self.cash += revenue
@@ -285,7 +292,9 @@ class QuantumCryptoTrader:
     
     def save_trade_history(self):
         """Save trade history to JSON file."""
-        filename = f"quantum_trades_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        # Add microseconds to prevent filename collisions
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+        filename = f"quantum_trades_{timestamp}.json"
         with open(filename, 'w') as f:
             json.dump({
                 "final_cash": self.cash,
