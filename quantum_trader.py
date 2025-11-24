@@ -8,7 +8,6 @@ Not financial advice! Extreme volatility ahead! CHAOS MODE ACTIVATED!
 
 import random
 import time
-import sys
 from datetime import datetime
 from typing import List, Dict, Tuple
 import json
@@ -70,7 +69,8 @@ class QuantumCryptoTrader:
             quantum_noise *= 3  # MEGA PUMP OR DUMP!
             print(f"🌊 QUANTUM WAVE DETECTED FOR {symbol}! 🌊")
         
-        return base * (1 + quantum_noise)
+        # Ensure price remains positive even with maximum chaos
+        return max(0.01, base * (1 + quantum_noise))
     
     def superposition_strategy_analysis(self, symbol: str, price: float) -> List[Tuple[str, float]]:
         """
@@ -102,6 +102,9 @@ class QuantumCryptoTrader:
         Analyze quantum entanglement between crypto pairs.
         When one moves, entangled pairs move in mysterious ways!
         """
+        if not symbols:
+            return {}
+        
         correlations = {}
         reference_symbol = symbols[0]
         
