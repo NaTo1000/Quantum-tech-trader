@@ -42,6 +42,7 @@ class QuantumCryptoTrader:
         self.portfolio = {symbol: 0.0 for symbol in CRYPTO_SYMBOLS}
         self.cash = 10000.0  # Starting with $10k (virtual!)
         self.trade_history: List[Dict] = []
+        self.price_cache: Dict[str, float] = {}  # Cache prices within a trading cycle
         print("⚡ QUANTUM CRYPTO TRADER INITIALIZED ⚡")
         print(f"💀 CHAOS LEVEL: {chaos_level * 100}% 💀")
         print("⚠️  REMEMBER: THIS IS EXPERIMENTAL - TRADE AT YOUR OWN RISK! ⚠️\n")
@@ -103,7 +104,6 @@ class QuantumCryptoTrader:
         """
         correlations = {}
         reference_symbol = symbols[0]
-        ref_price = self.quantum_price_oracle(reference_symbol)
         
         for symbol in symbols:
             if symbol == reference_symbol:
@@ -197,6 +197,9 @@ class QuantumCryptoTrader:
         print(f"🌀 QUANTUM TRADING CYCLE | State: {self.quantum_state} 🌀")
         print("="*60 + "\n")
         
+        # Clear price cache at start of new cycle for consistent pricing
+        self.price_cache.clear()
+        
         # Randomly shift quantum state
         self.quantum_state = random.choice(QUANTUM_STATES)
         
@@ -207,7 +210,9 @@ class QuantumCryptoTrader:
         active_symbols = random.sample(CRYPTO_SYMBOLS, k=random.randint(2, 5))
         
         for symbol in active_symbols:
+            # Cache price for consistency within this cycle
             price = self.quantum_price_oracle(symbol)
+            self.price_cache[symbol] = price
             print(f"\n💰 {symbol}: ${price:.8f}")
             
             # Evaluate strategies in superposition
@@ -234,7 +239,10 @@ class QuantumCryptoTrader:
         total_crypto_value = 0
         for symbol, amount in self.portfolio.items():
             if amount > 0:
-                current_price = self.quantum_price_oracle(symbol)
+                # Use cached price if available for consistent valuation within cycle
+                if symbol not in self.price_cache:
+                    self.price_cache[symbol] = self.quantum_price_oracle(symbol)
+                current_price = self.price_cache[symbol]
                 value = amount * current_price
                 total_crypto_value += value
                 print(f"   {symbol}: {amount:.6f} (≈${value:.2f})")
