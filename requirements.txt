@@ -1,0 +1,3 @@
+# Quantum Crypto Trader Dependencies
+# No external dependencies needed - uses Python standard library only!
+# Requires Python 3.6+
