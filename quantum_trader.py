@@ -8,8 +8,10 @@ Not financial advice! Extreme volatility ahead! CHAOS MODE ACTIVATED!
 
 import hashlib
 import json
+import os
 import random
 import secrets
+import tempfile
 import time
 from datetime import datetime
 from typing import List, Dict, Tuple
@@ -34,7 +36,7 @@ class CyfescalBlockchain:
     and a random salt to mimic a post-quantum-style signature.
     """
 
-    def __init__(self, ledger_file: str = "cyfescal_chain.json", signature_prefix: str = "QNDC"):
+    def __init__(self, ledger_file: str = "cyfescal_chain.json", signature_prefix: str = "CYFE"):
         self.ledger_file = ledger_file
         self.signature_prefix = signature_prefix
         self.chain: List[Dict] = []
@@ -49,6 +51,9 @@ class CyfescalBlockchain:
         return f"{self.signature_prefix}-{digest}"
 
     def add_block(self, trade: Dict):
+        for field in ("timestamp", "action", "symbol"):
+            if field not in trade:
+                raise ValueError(f"Trade missing required field: {field}")
         previous_hash = self.chain[-1]["block_hash"] if self.chain else "GENESIS"
         block_hash = self._quantum_signature(trade, previous_hash)
         block = {
@@ -61,8 +66,14 @@ class CyfescalBlockchain:
 
     def save(self):
         try:
-            with open(self.ledger_file, "w") as f:
-                json.dump(self.chain, f, indent=2)
+            fd, temp_path = tempfile.mkstemp(prefix="cyfescal_", suffix=".json", dir=".")
+            try:
+                with os.fdopen(fd, "w") as f:
+                    json.dump(self.chain, f, indent=2)
+                os.replace(temp_path, self.ledger_file)
+            finally:
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
         except OSError as exc:
             message = f"⚠️  Failed to persist Cyfescal ledger: {exc}"
             print(message)
@@ -106,9 +117,15 @@ class QuantumCryptoTrader:
         ⚠️ NOT REAL PRICES - SIMULATED CHAOS! ⚠️
         """
         base_prices = {
-            "BTC": 45000, "ETH": 3000, "DOGE": 0.15,
-            "SHIB": 0.00001, "ADA": 0.50, "SOL": 100,
-            "MATIC": 0.80, "AVAX": 35, "QNDC": 1.5,
+            "BTC": 45000,
+            "ETH": 3000,
+            "DOGE": 0.15,
+            "SHIB": 0.00001,
+            "ADA": 0.50,
+            "SOL": 100,
+            "MATIC": 0.80,
+            "AVAX": 35,
+            "QNDC": 1.5,
             "CYFEe": 0.75,
         }
         
