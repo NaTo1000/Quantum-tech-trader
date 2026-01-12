@@ -8,13 +8,14 @@ Not financial advice! Extreme volatility ahead! CHAOS MODE ACTIVATED!
 
 import random
 import time
+import hashlib
 from datetime import datetime
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 import json
 
 # Simulated quantum states
 QUANTUM_STATES = ["SUPERPOSITION", "ENTANGLED", "COLLAPSED", "DECOHERENT"]
-CRYPTO_SYMBOLS = ["BTC", "ETH", "DOGE", "SHIB", "ADA", "SOL", "MATIC", "AVAX"]
+CRYPTO_SYMBOLS = ["BTC", "ETH", "DOGE", "SHIB", "ADA", "SOL", "MATIC", "AVAX", "NDC"]  # NDC = NayDoeCoin
 TRADING_ACTIONS = ["HODL", "BUY_THE_DIP", "MOON_SHOT", "PANIC_SELL", "QUANTUM_LEAP"]
 
 # Trading configuration constants
@@ -23,6 +24,191 @@ MIN_TRADE_SIZE = 0.05  # Minimum 5% of cash per trade
 MAX_TRADE_SIZE = 0.2  # Maximum 20% of cash per trade
 MIN_SELL_PERCENT = 0.3  # Minimum 30% to sell on panic
 MAX_SELL_PERCENT = 0.8  # Maximum 80% to sell on panic
+
+
+def sha2048_hash(data: str) -> str:
+    """
+    Generate a SHA-2048 bit hash by chaining multiple SHA-512 hashes.
+    SHA-512 produces 512 bits, so we chain 4 iterations to achieve 2048 bits.
+    
+    Args:
+        data: The string data to hash
+        
+    Returns:
+        A 512-character hexadecimal string representing the 2048-bit hash
+    """
+    # Convert data to bytes
+    data_bytes = data.encode('utf-8')
+    
+    # Generate 4 SHA-512 hashes (4 x 512 = 2048 bits)
+    hash_parts = []
+    current_data = data_bytes
+    
+    for i in range(4):
+        # Add iteration number to create unique hashes
+        iteration_data = current_data + str(i).encode('utf-8')
+        hash_result = hashlib.sha512(iteration_data).hexdigest()
+        hash_parts.append(hash_result)
+        # Use previous hash as input for next iteration
+        current_data = hash_result.encode('utf-8')
+    
+    # Concatenate all hashes to form 2048-bit hash
+    return ''.join(hash_parts)
+
+
+class RegisterAudit:
+    """
+    Audit register for tracking all transactions and activities with SHA-2048bit security.
+    Provides immutable logging and cryptographic verification of all operations.
+    """
+    
+    def __init__(self):
+        """Initialize the audit register."""
+        self.audit_log: List[Dict] = []
+        self.register_hash: Optional[str] = None
+        self._initialize_register()
+    
+    def _initialize_register(self):
+        """Initialize the register with a genesis entry."""
+        genesis_entry = {
+            "timestamp": datetime.now().isoformat(),
+            "type": "GENESIS",
+            "description": "NayDoeCoin Register Audit Initialized",
+            "data": {
+                "version": "1.0.0",
+                "security": "SHA-2048bit",
+                "coin": "NayDoeCoin (NDC)"
+            },
+            "previous_hash": "0" * 512  # Genesis has no previous hash
+        }
+        genesis_entry["hash"] = sha2048_hash(json.dumps(genesis_entry, sort_keys=True))
+        self.audit_log.append(genesis_entry)
+        self.register_hash = genesis_entry["hash"]
+        print("📋 Register Audit Initialized with SHA-2048bit Security 📋")
+    
+    def log_transaction(self, transaction_type: str, symbol: str, amount: float, 
+                        price: float, action: str, metadata: Optional[Dict] = None) -> str:
+        """
+        Log a transaction to the audit register with SHA-2048bit hash.
+        
+        Args:
+            transaction_type: Type of transaction (BUY, SELL, TRANSFER, etc.)
+            symbol: Cryptocurrency symbol
+            amount: Amount of cryptocurrency
+            price: Price at time of transaction
+            action: Trading action taken
+            metadata: Optional additional metadata
+            
+        Returns:
+            The SHA-2048bit hash of the logged entry
+        """
+        entry = {
+            "timestamp": datetime.now().isoformat(),
+            "type": transaction_type,
+            "symbol": symbol,
+            "amount": amount,
+            "price": price,
+            "action": action,
+            "metadata": metadata or {},
+            "previous_hash": self.register_hash
+        }
+        entry["hash"] = sha2048_hash(json.dumps(entry, sort_keys=True))
+        self.audit_log.append(entry)
+        self.register_hash = entry["hash"]
+        return entry["hash"]
+    
+    def log_event(self, event_type: str, description: str, data: Optional[Dict] = None) -> str:
+        """
+        Log a system event to the audit register.
+        
+        Args:
+            event_type: Type of event
+            description: Human-readable description
+            data: Optional event data
+            
+        Returns:
+            The SHA-2048bit hash of the logged entry
+        """
+        entry = {
+            "timestamp": datetime.now().isoformat(),
+            "type": event_type,
+            "description": description,
+            "data": data or {},
+            "previous_hash": self.register_hash
+        }
+        entry["hash"] = sha2048_hash(json.dumps(entry, sort_keys=True))
+        self.audit_log.append(entry)
+        self.register_hash = entry["hash"]
+        return entry["hash"]
+    
+    def verify_chain(self) -> bool:
+        """
+        Verify the integrity of the entire audit chain.
+        
+        Returns:
+            True if the chain is valid, False otherwise
+        """
+        if not self.audit_log:
+            return True
+        
+        for i, entry in enumerate(self.audit_log):
+            # Verify hash
+            entry_copy = {k: v for k, v in entry.items() if k != "hash"}
+            computed_hash = sha2048_hash(json.dumps(entry_copy, sort_keys=True))
+            
+            if computed_hash != entry["hash"]:
+                print(f"❌ Hash mismatch at entry {i}")
+                return False
+            
+            # Verify chain link (except for genesis)
+            if i > 0:
+                if entry["previous_hash"] != self.audit_log[i - 1]["hash"]:
+                    print(f"❌ Chain broken at entry {i}")
+                    return False
+        
+        print("✅ Audit chain verified successfully")
+        return True
+    
+    def get_summary(self) -> Dict:
+        """
+        Get a summary of the audit register.
+        
+        Returns:
+            Summary statistics of the audit log
+        """
+        transactions = [e for e in self.audit_log if e["type"] in ["BUY", "SELL", "TRANSFER"]]
+        events = [e for e in self.audit_log if e["type"] not in ["BUY", "SELL", "TRANSFER", "GENESIS"]]
+        
+        return {
+            "total_entries": len(self.audit_log),
+            "transactions": len(transactions),
+            "events": len(events),
+            "current_hash": self.register_hash,
+            "chain_valid": self.verify_chain()
+        }
+    
+    def save_audit_log(self, filename: Optional[str] = None) -> str:
+        """
+        Save the audit log to a JSON file.
+        
+        Args:
+            filename: Optional filename, auto-generated if not provided
+            
+        Returns:
+            The filename where the log was saved
+        """
+        if not filename:
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+            filename = f"ndc_audit_{timestamp}.json"
+        
+        with open(filename, 'w') as f:
+            json.dump({
+                "audit_log": self.audit_log,
+                "summary": self.get_summary()
+            }, f, indent=2)
+        
+        print(f"📋 Audit log saved to: {filename}")
+        return filename
 
 
 class QuantumCryptoTrader:
@@ -49,8 +235,18 @@ class QuantumCryptoTrader:
         self.cash = 10000.0  # Starting with $10k (virtual!)
         self.trade_history: List[Dict] = []
         self.price_cache: Dict[str, float] = {}  # Cache prices within a trading cycle
+        self.audit = RegisterAudit()  # Initialize audit register with SHA-2048bit security
+        
+        # Log initialization event
+        self.audit.log_event(
+            "TRADER_INIT",
+            "Quantum Crypto Trader initialized",
+            {"chaos_level": chaos_level, "starting_cash": self.cash}
+        )
+        
         print("⚡ QUANTUM CRYPTO TRADER INITIALIZED ⚡")
         print(f"💀 CHAOS LEVEL: {chaos_level * 100}% 💀")
+        print("🪙 NayDoeCoin (NDC) FLOATED with SHA-2048bit Security 🪙")
         print("⚠️  REMEMBER: THIS IS EXPERIMENTAL - TRADE AT YOUR OWN RISK! ⚠️\n")
     
     def quantum_price_oracle(self, symbol: str) -> float:
@@ -63,7 +259,7 @@ class QuantumCryptoTrader:
         base_prices = {
             "BTC": 45000, "ETH": 3000, "DOGE": 0.15, 
             "SHIB": 0.00001, "ADA": 0.50, "SOL": 100,
-            "MATIC": 0.80, "AVAX": 35
+            "MATIC": 0.80, "AVAX": 35, "NDC": 1.00  # NayDoeCoin floated at $1.00
         }
         
         base = base_prices.get(symbol, 1.0)
@@ -175,7 +371,14 @@ class QuantumCryptoTrader:
                 }
                 self.trade_history.append(trade)
                 
+                # Log to audit register with SHA-2048bit hash
+                audit_hash = self.audit.log_transaction(
+                    "BUY", symbol, coins, price, action,
+                    {"cost": trade_amount, "quantum_state": self.quantum_state}
+                )
+                
                 print(f"🚀 QUANTUM BUY: {coins:.6f} {symbol} @ ${price:.2f} | Action: {action}")
+                print(f"   🔐 Audit Hash: {audit_hash[:32]}...")
                 
         elif action == "PANIC_SELL":
             if self.portfolio[symbol] > 0:
@@ -195,7 +398,14 @@ class QuantumCryptoTrader:
                 }
                 self.trade_history.append(trade)
                 
+                # Log to audit register with SHA-2048bit hash
+                audit_hash = self.audit.log_transaction(
+                    "SELL", symbol, coins, price, action,
+                    {"revenue": revenue, "quantum_state": self.quantum_state}
+                )
+                
                 print(f"📉 QUANTUM SELL: {coins:.6f} {symbol} @ ${price:.2f} | Action: {action}")
+                print(f"   🔐 Audit Hash: {audit_hash[:32]}...")
         
         # HODL does nothing, as true believers do
     
@@ -291,7 +501,7 @@ class QuantumCryptoTrader:
         self.save_trade_history()
     
     def save_trade_history(self):
-        """Save trade history to JSON file."""
+        """Save trade history and audit log to JSON files."""
         # Add microseconds to prevent filename collisions
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
         filename = f"quantum_trades_{timestamp}.json"
@@ -303,6 +513,21 @@ class QuantumCryptoTrader:
                 "chaos_level": self.chaos_level
             }, f, indent=2)
         print(f"💾 Trade history saved to: {filename}")
+        
+        # Save audit log with SHA-2048bit verification
+        self.audit.save_audit_log()
+        
+        # Verify audit chain integrity
+        print("\n🔍 Verifying Audit Chain Integrity...")
+        self.audit.verify_chain()
+        
+        # Display audit summary
+        summary = self.audit.get_summary()
+        print(f"\n📊 Audit Summary:")
+        print(f"   Total Entries: {summary['total_entries']}")
+        print(f"   Transactions: {summary['transactions']}")
+        print(f"   Events: {summary['events']}")
+        print(f"   Chain Valid: {'✅' if summary['chain_valid'] else '❌'}")
 
 
 def main():

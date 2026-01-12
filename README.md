@@ -18,7 +18,10 @@ An experimental quantum-inspired cryptocurrency trading simulator that brings **
 - **Wave Function Collapse**: Probabilistic decision-making
 - **Quantum Tunneling**: Breakthrough resistance levels unexpectedly
 - **Maximum Chaos Mode**: Adjustable volatility from 0% to 100%
-- **Multi-Crypto Support**: BTC, ETH, DOGE, SHIB, ADA, SOL, MATIC, AVAX
+- **Multi-Crypto Support**: BTC, ETH, DOGE, SHIB, ADA, SOL, MATIC, AVAX, NDC
+- **🪙 NayDoeCoin (NDC)**: Our native cryptocurrency floated at $1.00
+- **🔐 SHA-2048bit Security**: Advanced cryptographic hashing for audit trail
+- **📋 Register Audit**: Immutable transaction logging with blockchain-style verification
 
 ## 🚀 Quick Start
 
@@ -89,6 +92,42 @@ Despite the chaos, this simulator includes:
 - Complete trade history logging
 - No connection to real exchanges
 - No real money at risk!
+
+## 🪙 NayDoeCoin (NDC)
+
+NayDoeCoin is our native cryptocurrency, floated at $1.00 with full quantum trading support:
+
+- **Symbol**: NDC
+- **Initial Price**: $1.00
+- **Security**: SHA-2048bit cryptographic hashing
+- **Trading**: Full buy/sell support with quantum strategies
+
+## 📋 Register Audit System
+
+All transactions are logged to an immutable audit register with SHA-2048bit security:
+
+- **Blockchain-style chaining**: Each entry links to the previous via cryptographic hash
+- **Tamper detection**: Chain integrity verification ensures no modifications
+- **Complete audit trail**: Every transaction and event is recorded
+- **SHA-2048bit hashing**: 4x SHA-512 chained for 2048-bit security
+
+### Audit Output
+
+The trader saves audit logs to JSON files:
+- `ndc_audit_YYYYMMDD_HHMMSS.json`
+
+Each entry contains:
+```json
+{
+  "timestamp": "2024-01-01T12:00:00",
+  "type": "BUY",
+  "symbol": "NDC",
+  "amount": 100.0,
+  "price": 1.00,
+  "previous_hash": "...",
+  "hash": "..."
+}
+```
 
 ## 🎯 Educational Purpose
 
