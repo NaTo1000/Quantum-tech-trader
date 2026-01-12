@@ -28,29 +28,27 @@ MAX_SELL_PERCENT = 0.8  # Maximum 80% to sell on panic
 
 def sha2048_hash(data: str) -> str:
     """
-    Generate a SHA-2048 bit hash by chaining multiple SHA-512 hashes.
-    SHA-512 produces 512 bits, so we chain 4 iterations to achieve 2048 bits.
+    Generate a SHA-2048 bit hash by combining multiple SHA-512 hashes.
+    SHA-512 produces 512 bits (128 hex characters), so we use 4 independent
+    hashes with different salts to produce 2048 bits (512 hex characters).
     
     Args:
         data: The string data to hash
         
     Returns:
-        A 512-character hexadecimal string representing the 2048-bit hash
+        A 512-character hexadecimal string (2048 bits encoded as hex)
     """
     # Convert data to bytes
     data_bytes = data.encode('utf-8')
     
-    # Generate 4 SHA-512 hashes (4 x 512 = 2048 bits)
+    # Generate 4 independent SHA-512 hashes with unique salts (4 x 512 = 2048 bits)
     hash_parts = []
-    current_data = data_bytes
     
     for i in range(4):
-        # Add iteration number to create unique hashes
-        iteration_data = current_data + str(i).encode('utf-8')
-        hash_result = hashlib.sha512(iteration_data).hexdigest()
+        # Use index as salt for independent hash computation
+        salted_data = data_bytes + f"_salt_{i}_ndc".encode('utf-8')
+        hash_result = hashlib.sha512(salted_data).hexdigest()
         hash_parts.append(hash_result)
-        # Use previous hash as input for next iteration
-        current_data = hash_result.encode('utf-8')
     
     # Concatenate all hashes to form 2048-bit hash
     return ''.join(hash_parts)
