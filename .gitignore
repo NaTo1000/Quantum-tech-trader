@@ -1,5 +1,6 @@
 # Quantum trade history files
 quantum_trades_*.json
+quantum_trades_v2_*.json
 
 # Python
 __pycache__/
