@@ -30,17 +30,19 @@ MAX_SELL_PERCENT = 0.8  # Maximum 80% to sell on panic
 class CyfescalBlockchain:
     """
     Minimal simulated Cyfescal blockchain ledger.
-    Uses a SHA3-512 based "quantum-style" signature to chain trades together.
+    Each trade is chained with a SHA3-512 hash over the payload, previous hash,
+    and a random salt to mimic a post-quantum-style signature.
     """
 
-    def __init__(self, ledger_file: str = "cyfescal_chain.json"):
+    def __init__(self, ledger_file: str = "cyfescal_chain.json", signature_prefix: str = "QNDC"):
         self.ledger_file = ledger_file
+        self.signature_prefix = signature_prefix
         self.chain: List[Dict] = []
 
     def _quantum_signature(self, payload: str, previous_hash: str) -> str:
         salt = secrets.token_hex(16)
         digest = hashlib.sha3_512(f"{payload}|{previous_hash}|{salt}".encode()).hexdigest()
-        return f"QNDC-{digest}"
+        return f"{self.signature_prefix}-{digest}"
 
     def add_block(self, trade: Dict):
         payload = json.dumps(trade, sort_keys=True)
@@ -55,8 +57,11 @@ class CyfescalBlockchain:
         self.chain.append(block)
 
     def save(self):
-        with open(self.ledger_file, "w") as f:
-            json.dump(self.chain, f, indent=2)
+        try:
+            with open(self.ledger_file, "w") as f:
+                json.dump(self.chain, f, indent=2)
+        except OSError as exc:
+            print(f"⚠️  Failed to persist Cyfescal ledger: {exc}")
 
 
 class QuantumCryptoTrader:
