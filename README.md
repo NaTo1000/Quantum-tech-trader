@@ -20,6 +20,14 @@ An experimental quantum-inspired cryptocurrency trading simulator that brings **
 - **Maximum Chaos Mode**: Adjustable volatility from 0% to 100%
 - **Multi-Crypto Support**: BTC, ETH, DOGE, SHIB, ADA, SOL, MATIC, AVAX
 
+### 🚀 Fast Market Data Scraping (NEW!)
+
+- **Multi-Source Aggregation**: Query CoinGecko, Binance, and more in parallel
+- **WebSocket-Style Streaming**: Real-time price updates with minimal latency
+- **Smart TTL Caching**: LRU cache with time-to-live for optimal performance
+- **Price Change Detection**: Configurable alerts for significant market moves
+- **Batch Requests**: Efficient multi-symbol queries in a single API call
+
 ## 🚀 Quick Start
 
 ```bash
@@ -30,6 +38,16 @@ python3 quantum_trader.py
 Follow the prompts to set your chaos level (0.0-1.0) and number of trading cycles.
 
 **Recommended**: Start with chaos level 0.5 to ease into the madness! 🎢
+
+### Market Scraper
+
+```bash
+# Run the market scraper demo
+python3 market_scraper.py
+
+# Or use it programmatically
+python3 scraper_example.py
+```
 
 ## 💡 How It Works
 
@@ -111,6 +129,77 @@ Want to add more chaos? Feel free to contribute! Ideas:
 ## 📜 License
 
 MIT License - Use at your own risk!
+
+## 🚀 Market Scraper - Fast Data Algorithms
+
+The `market_scraper.py` module implements high-performance scraping algorithms for real-time market data:
+
+### Scraping Strategies
+
+| Strategy | Latency | Best For |
+|----------|---------|----------|
+| WebSocket Streaming | Sub-500ms | Real-time trading, live dashboards |
+| Async HTTP Batch | 100-500ms | Multi-symbol queries, snapshots |
+| Cached REST | 0ms (hit) | High-frequency repeated queries |
+
+### Quick Usage
+
+```python
+from market_scraper import QuantumMarketScraper
+
+# Create scraper with default settings
+scraper = QuantumMarketScraper(
+    symbols=["BTC", "ETH", "SOL"],
+    cache_ttl=5.0,           # Cache for 5 seconds
+    change_threshold=1.0     # Alert on 1% changes
+)
+
+# Get current prices
+prices = scraper.get_prices()
+for symbol, tick in prices.items():
+    print(f"{symbol}: ${tick.price:,.2f}")
+
+# Set up price alerts
+def on_alert(alert):
+    print(f"🚨 {alert['symbol']} moved {alert['change_percent']:.2f}%!")
+
+scraper.subscribe_alerts(on_alert)
+
+# Start streaming (runs in background thread)
+scraper.start_streaming()
+```
+
+### Available Scrapers
+
+1. **CoinGeckoScraper**: Free API, no key required, includes 24h volume/change
+2. **BinanceScraper**: Low latency, includes bid/ask spread, order book access
+3. **AsyncMarketAggregator**: Queries multiple sources in parallel
+4. **WebSocketPriceStream**: Simulated streaming with callbacks
+5. **PriceChangeDetector**: Volatility tracking and threshold alerts
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   QuantumMarketScraper                      │
+│  (High-level API with all features integrated)              │
+└──────────────────────┬──────────────────────────────────────┘
+                       │
+       ┌───────────────┼───────────────┐
+       │               │               │
+       ▼               ▼               ▼
+┌──────────────┐ ┌───────────────┐ ┌────────────────┐
+│  Aggregator  │ │  WebSocket    │ │  Change        │
+│  (Multi-src) │ │  Stream       │ │  Detector      │
+└──────┬───────┘ └───────────────┘ └────────────────┘
+       │
+       ├───────────────┬───────────────┐
+       ▼               ▼               ▼
+┌──────────────┐ ┌───────────────┐ ┌────────────────┐
+│  CoinGecko   │ │   Binance     │ │  TTL Cache     │
+│  Scraper     │ │   Scraper     │ │  (LRU + TTL)   │
+└──────────────┘ └───────────────┘ └────────────────┘
+```
 
 ## 🔥 Let It Rip!
 
