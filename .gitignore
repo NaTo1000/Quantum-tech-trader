@@ -1,6 +1,9 @@
 # Quantum trade history files
 quantum_trades_*.json
 
+# NayDoeCoin audit log files
+ndc_audit_*.json
+
 # Python
 __pycache__/
 *.py[cod]
