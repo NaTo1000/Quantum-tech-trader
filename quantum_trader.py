@@ -41,7 +41,11 @@ class CyfescalBlockchain:
 
     def _quantum_signature(self, payload: str, previous_hash: str) -> str:
         salt = secrets.token_hex(16)
-        digest = hashlib.sha3_512(f"{payload}|{previous_hash}|{salt}".encode()).hexdigest()
+        digest_input = json.dumps(
+            {"payload": payload, "previous_hash": previous_hash, "salt": salt},
+            sort_keys=True,
+        ).encode()
+        digest = hashlib.sha3_512(digest_input).hexdigest()
         return f"{self.signature_prefix}-{digest}"
 
     def add_block(self, trade: Dict):
@@ -61,7 +65,9 @@ class CyfescalBlockchain:
             with open(self.ledger_file, "w") as f:
                 json.dump(self.chain, f, indent=2)
         except OSError as exc:
-            print(f"⚠️  Failed to persist Cyfescal ledger: {exc}")
+            message = f"⚠️  Failed to persist Cyfescal ledger: {exc}"
+            print(message)
+            raise
 
 
 class QuantumCryptoTrader:
