@@ -66,7 +66,7 @@ class CyfescalBlockchain:
 
     def save(self):
         try:
-            fd, temp_path = tempfile.mkstemp(prefix="cyfescal_", suffix=".json", dir=".")
+            fd, temp_path = tempfile.mkstemp(prefix="cyfescal_", suffix=".json")
             try:
                 with os.fdopen(fd, "w") as f:
                     json.dump(self.chain, f, indent=2)
@@ -78,7 +78,6 @@ class CyfescalBlockchain:
                     except OSError:
                         pass
         except OSError as exc:
-            print(f"⚠️  Failed to persist Cyfescal ledger: {exc}")
             raise
 
 
