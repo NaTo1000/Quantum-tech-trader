@@ -18,7 +18,8 @@ An experimental quantum-inspired cryptocurrency trading simulator that brings **
 - **Wave Function Collapse**: Probabilistic decision-making
 - **Quantum Tunneling**: Breakthrough resistance levels unexpectedly
 - **Maximum Chaos Mode**: Adjustable volatility from 0% to 100%
-- **Multi-Crypto Support**: BTC, ETH, DOGE, SHIB, ADA, SOL, MATIC, AVAX
+- **Multi-Crypto Support**: BTC, ETH, DOGE, SHIB, ADA, SOL, MATIC, AVAX, QNDC, CYFEe
+- **Cyfescal Ledger Simulation**: Logs trades for NayDoeCoin (QNDC) and Cyfescal coin (CYFEe) with quantum-style signatures
 
 ## 🚀 Quick Start
 
@@ -68,6 +69,7 @@ The Quantum Crypto Trader uses quantum-inspired algorithms:
 
 The trader saves a complete history of all trades to a JSON file:
 - `quantum_trades_YYYYMMDD_HHMMSS.json`
+- Cyfescal blockchain ledger entries are also written to `cyfescal_chain.json`
 
 ## ⚡ Requirements
 

@@ -6,15 +6,17 @@ This is an experimental quantum-inspired cryptocurrency trading system.
 Not financial advice! Extreme volatility ahead! CHAOS MODE ACTIVATED!
 """
 
+import hashlib
+import json
 import random
+import secrets
 import time
 from datetime import datetime
 from typing import List, Dict, Tuple
-import json
 
 # Simulated quantum states
 QUANTUM_STATES = ["SUPERPOSITION", "ENTANGLED", "COLLAPSED", "DECOHERENT"]
-CRYPTO_SYMBOLS = ["BTC", "ETH", "DOGE", "SHIB", "ADA", "SOL", "MATIC", "AVAX"]
+CRYPTO_SYMBOLS = ["BTC", "ETH", "DOGE", "SHIB", "ADA", "SOL", "MATIC", "AVAX", "QNDC", "CYFEe"]
 TRADING_ACTIONS = ["HODL", "BUY_THE_DIP", "MOON_SHOT", "PANIC_SELL", "QUANTUM_LEAP"]
 
 # Trading configuration constants
@@ -23,6 +25,38 @@ MIN_TRADE_SIZE = 0.05  # Minimum 5% of cash per trade
 MAX_TRADE_SIZE = 0.2  # Maximum 20% of cash per trade
 MIN_SELL_PERCENT = 0.3  # Minimum 30% to sell on panic
 MAX_SELL_PERCENT = 0.8  # Maximum 80% to sell on panic
+
+
+class CyfescalBlockchain:
+    """
+    Minimal simulated Cyfescal blockchain ledger.
+    Uses a SHA3-512 based "quantum-style" signature to chain trades together.
+    """
+
+    def __init__(self, ledger_file: str = "cyfescal_chain.json"):
+        self.ledger_file = ledger_file
+        self.chain: List[Dict] = []
+
+    def _quantum_signature(self, payload: str, previous_hash: str) -> str:
+        salt = secrets.token_hex(16)
+        digest = hashlib.sha3_512(f"{payload}|{previous_hash}|{salt}".encode()).hexdigest()
+        return f"QNDC-{digest}"
+
+    def add_block(self, trade: Dict):
+        payload = json.dumps(trade, sort_keys=True)
+        previous_hash = self.chain[-1]["block_hash"] if self.chain else "GENESIS"
+        block_hash = self._quantum_signature(payload, previous_hash)
+        block = {
+            "timestamp": trade.get("timestamp", datetime.now().isoformat()),
+            "payload": trade,
+            "previous_hash": previous_hash,
+            "block_hash": block_hash,
+        }
+        self.chain.append(block)
+
+    def save(self):
+        with open(self.ledger_file, "w") as f:
+            json.dump(self.chain, f, indent=2)
 
 
 class QuantumCryptoTrader:
@@ -49,6 +83,7 @@ class QuantumCryptoTrader:
         self.cash = 10000.0  # Starting with $10k (virtual!)
         self.trade_history: List[Dict] = []
         self.price_cache: Dict[str, float] = {}  # Cache prices within a trading cycle
+        self.blockchain = CyfescalBlockchain()
         print("⚡ QUANTUM CRYPTO TRADER INITIALIZED ⚡")
         print(f"💀 CHAOS LEVEL: {chaos_level * 100}% 💀")
         print("⚠️  REMEMBER: THIS IS EXPERIMENTAL - TRADE AT YOUR OWN RISK! ⚠️\n")
@@ -61,9 +96,10 @@ class QuantumCryptoTrader:
         ⚠️ NOT REAL PRICES - SIMULATED CHAOS! ⚠️
         """
         base_prices = {
-            "BTC": 45000, "ETH": 3000, "DOGE": 0.15, 
+            "BTC": 45000, "ETH": 3000, "DOGE": 0.15,
             "SHIB": 0.00001, "ADA": 0.50, "SOL": 100,
-            "MATIC": 0.80, "AVAX": 35
+            "MATIC": 0.80, "AVAX": 35, "QNDC": 1.5,
+            "CYFEe": 0.75
         }
         
         base = base_prices.get(symbol, 1.0)
@@ -174,6 +210,7 @@ class QuantumCryptoTrader:
                     "quantum_state": self.quantum_state
                 }
                 self.trade_history.append(trade)
+                self.blockchain.add_block(trade)
                 
                 print(f"🚀 QUANTUM BUY: {coins:.6f} {symbol} @ ${price:.2f} | Action: {action}")
                 
@@ -194,6 +231,7 @@ class QuantumCryptoTrader:
                     "quantum_state": self.quantum_state
                 }
                 self.trade_history.append(trade)
+                self.blockchain.add_block(trade)
                 
                 print(f"📉 QUANTUM SELL: {coins:.6f} {symbol} @ ${price:.2f} | Action: {action}")
         
@@ -303,6 +341,8 @@ class QuantumCryptoTrader:
                 "chaos_level": self.chaos_level
             }, f, indent=2)
         print(f"💾 Trade history saved to: {filename}")
+        self.blockchain.save()
+        print(f"🔗 Cyfescal ledger updated: {self.blockchain.ledger_file}")
 
 
 def main():
