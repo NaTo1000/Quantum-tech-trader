@@ -57,7 +57,7 @@ class CyfescalBlockchain:
         previous_hash = self.chain[-1]["block_hash"] if self.chain else "GENESIS"
         block_hash = self._quantum_signature(trade, previous_hash)
         block = {
-            "timestamp": trade.get("timestamp", datetime.now().isoformat()),
+            "timestamp": trade["timestamp"],
             "payload": trade,
             "previous_hash": previous_hash,
             "block_hash": block_hash,
@@ -73,10 +73,12 @@ class CyfescalBlockchain:
                 os.replace(temp_path, self.ledger_file)
             finally:
                 if os.path.exists(temp_path):
-                    os.remove(temp_path)
+                    try:
+                        os.remove(temp_path)
+                    except OSError:
+                        pass
         except OSError as exc:
-            message = f"⚠️  Failed to persist Cyfescal ledger: {exc}"
-            print(message)
+            print(f"⚠️  Failed to persist Cyfescal ledger: {exc}")
             raise
 
 
