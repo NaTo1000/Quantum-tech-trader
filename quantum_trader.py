@@ -39,7 +39,7 @@ class CyfescalBlockchain:
         self.signature_prefix = signature_prefix
         self.chain: List[Dict] = []
 
-    def _quantum_signature(self, payload: str, previous_hash: str) -> str:
+    def _quantum_signature(self, payload: Dict, previous_hash: str) -> str:
         salt = secrets.token_hex(16)
         digest_input = json.dumps(
             {"payload": payload, "previous_hash": previous_hash, "salt": salt},
@@ -49,9 +49,8 @@ class CyfescalBlockchain:
         return f"{self.signature_prefix}-{digest}"
 
     def add_block(self, trade: Dict):
-        payload = json.dumps(trade, sort_keys=True)
         previous_hash = self.chain[-1]["block_hash"] if self.chain else "GENESIS"
-        block_hash = self._quantum_signature(payload, previous_hash)
+        block_hash = self._quantum_signature(trade, previous_hash)
         block = {
             "timestamp": trade.get("timestamp", datetime.now().isoformat()),
             "payload": trade,
@@ -110,7 +109,7 @@ class QuantumCryptoTrader:
             "BTC": 45000, "ETH": 3000, "DOGE": 0.15,
             "SHIB": 0.00001, "ADA": 0.50, "SOL": 100,
             "MATIC": 0.80, "AVAX": 35, "QNDC": 1.5,
-            "CYFEe": 0.75
+            "CYFEe": 0.75,
         }
         
         base = base_prices.get(symbol, 1.0)
