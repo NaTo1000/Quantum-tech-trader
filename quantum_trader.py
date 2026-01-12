@@ -6,15 +6,19 @@ This is an experimental quantum-inspired cryptocurrency trading system.
 Not financial advice! Extreme volatility ahead! CHAOS MODE ACTIVATED!
 """
 
+import hashlib
+import json
+import os
 import random
+import secrets
+import tempfile
 import time
 from datetime import datetime
 from typing import List, Dict, Tuple
-import json
 
 # Simulated quantum states
 QUANTUM_STATES = ["SUPERPOSITION", "ENTANGLED", "COLLAPSED", "DECOHERENT"]
-CRYPTO_SYMBOLS = ["BTC", "ETH", "DOGE", "SHIB", "ADA", "SOL", "MATIC", "AVAX"]
+CRYPTO_SYMBOLS = ["BTC", "ETH", "DOGE", "SHIB", "ADA", "SOL", "MATIC", "AVAX", "QNDC", "CYFEe"]
 TRADING_ACTIONS = ["HODL", "BUY_THE_DIP", "MOON_SHOT", "PANIC_SELL", "QUANTUM_LEAP"]
 
 # Trading configuration constants
@@ -23,6 +27,58 @@ MIN_TRADE_SIZE = 0.05  # Minimum 5% of cash per trade
 MAX_TRADE_SIZE = 0.2  # Maximum 20% of cash per trade
 MIN_SELL_PERCENT = 0.3  # Minimum 30% to sell on panic
 MAX_SELL_PERCENT = 0.8  # Maximum 80% to sell on panic
+
+
+class CyfescalBlockchain:
+    """
+    Minimal simulated Cyfescal blockchain ledger.
+    Each trade is chained with a SHA3-512 hash over the payload, previous hash,
+    and a random salt to mimic a post-quantum-style signature.
+    """
+
+    def __init__(self, ledger_file: str = "cyfescal_chain.json", signature_prefix: str = "CYFE"):
+        self.ledger_file = ledger_file
+        self.signature_prefix = signature_prefix
+        self.chain: List[Dict] = []
+
+    def _quantum_signature(self, payload: Dict, previous_hash: str) -> str:
+        salt = secrets.token_hex(16)
+        digest_input = json.dumps(
+            {"payload": payload, "previous_hash": previous_hash, "salt": salt},
+            sort_keys=True,
+        ).encode()
+        digest = hashlib.sha3_512(digest_input).hexdigest()
+        return f"{self.signature_prefix}-{digest}"
+
+    def add_block(self, trade: Dict):
+        for field in ("timestamp", "action", "symbol"):
+            if field not in trade:
+                raise ValueError(f"Trade missing required field: {field}")
+        previous_hash = self.chain[-1]["block_hash"] if self.chain else "GENESIS"
+        block_hash = self._quantum_signature(trade, previous_hash)
+        block = {
+            "timestamp": trade["timestamp"],
+            "payload": trade,
+            "previous_hash": previous_hash,
+            "block_hash": block_hash,
+        }
+        self.chain.append(block)
+
+    def save(self):
+        try:
+            fd, temp_path = tempfile.mkstemp(prefix="cyfescal_", suffix=".json")
+            try:
+                with os.fdopen(fd, "w") as f:
+                    json.dump(self.chain, f, indent=2)
+                os.replace(temp_path, self.ledger_file)
+            finally:
+                if os.path.exists(temp_path):
+                    try:
+                        os.remove(temp_path)
+                    except OSError:
+                        pass
+        except OSError as exc:
+            raise
 
 
 class QuantumCryptoTrader:
@@ -49,6 +105,7 @@ class QuantumCryptoTrader:
         self.cash = 10000.0  # Starting with $10k (virtual!)
         self.trade_history: List[Dict] = []
         self.price_cache: Dict[str, float] = {}  # Cache prices within a trading cycle
+        self.blockchain = CyfescalBlockchain()
         print("⚡ QUANTUM CRYPTO TRADER INITIALIZED ⚡")
         print(f"💀 CHAOS LEVEL: {chaos_level * 100}% 💀")
         print("⚠️  REMEMBER: THIS IS EXPERIMENTAL - TRADE AT YOUR OWN RISK! ⚠️\n")
@@ -61,9 +118,16 @@ class QuantumCryptoTrader:
         ⚠️ NOT REAL PRICES - SIMULATED CHAOS! ⚠️
         """
         base_prices = {
-            "BTC": 45000, "ETH": 3000, "DOGE": 0.15, 
-            "SHIB": 0.00001, "ADA": 0.50, "SOL": 100,
-            "MATIC": 0.80, "AVAX": 35
+            "BTC": 45000,
+            "ETH": 3000,
+            "DOGE": 0.15,
+            "SHIB": 0.00001,
+            "ADA": 0.50,
+            "SOL": 100,
+            "MATIC": 0.80,
+            "AVAX": 35,
+            "QNDC": 1.5,
+            "CYFEe": 0.75,
         }
         
         base = base_prices.get(symbol, 1.0)
@@ -174,6 +238,7 @@ class QuantumCryptoTrader:
                     "quantum_state": self.quantum_state
                 }
                 self.trade_history.append(trade)
+                self.blockchain.add_block(trade)
                 
                 print(f"🚀 QUANTUM BUY: {coins:.6f} {symbol} @ ${price:.2f} | Action: {action}")
                 
@@ -194,6 +259,7 @@ class QuantumCryptoTrader:
                     "quantum_state": self.quantum_state
                 }
                 self.trade_history.append(trade)
+                self.blockchain.add_block(trade)
                 
                 print(f"📉 QUANTUM SELL: {coins:.6f} {symbol} @ ${price:.2f} | Action: {action}")
         
@@ -303,6 +369,8 @@ class QuantumCryptoTrader:
                 "chaos_level": self.chaos_level
             }, f, indent=2)
         print(f"💾 Trade history saved to: {filename}")
+        self.blockchain.save()
+        print(f"🔗 Cyfescal ledger updated: {self.blockchain.ledger_file}")
 
 
 def main():
