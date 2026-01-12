@@ -12,18 +12,17 @@ This module implements multiple scraping strategies optimized for speed:
 ⚠️ DISCLAIMER: For educational purposes only. Respect API rate limits! ⚠️
 """
 
-import asyncio
 import json
-import time
+import ssl
 import threading
+import time
 from abc import ABC, abstractmethod
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional, Set
-from urllib.request import urlopen, Request
-from urllib.error import URLError, HTTPError
-import ssl
+from typing import Any, Callable, Dict, List, Optional
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 # =============================================================================
 # Data Structures

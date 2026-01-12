@@ -6,14 +6,16 @@ Demonstrates fast market data scraping algorithms
 ⚠️ EDUCATIONAL USE ONLY - RESPECT API RATE LIMITS! ⚠️
 """
 
+import time
+
 from market_scraper import (
-    QuantumMarketScraper,
-    CoinGeckoScraper,
-    BinanceScraper,
     AsyncMarketAggregator,
-    WebSocketPriceStream,
-    PriceChangeDetector,
+    BinanceScraper,
+    CoinGeckoScraper,
     MarketTick,
+    PriceChangeDetector,
+    QuantumMarketScraper,
+    WebSocketPriceStream,
 )
 
 # =============================================================================
@@ -108,8 +110,6 @@ def example_streaming():
     try:
         stream.start()
         # Let it run for a few seconds in demo
-        import time
-
         time.sleep(5)
     except KeyboardInterrupt:
         pass
@@ -134,8 +134,6 @@ def example_change_detection():
     )
 
     # Simulate some price ticks
-    import time
-
     prices = [50000, 50100, 50200, 50500, 50000, 49500, 50000]
 
     print("\n📊 Processing simulated BTC price ticks...")
