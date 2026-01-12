@@ -48,7 +48,7 @@ Follow the prompts to set your chaos level (0.0-1.0) and number of trading cycle
 
 The V2 edition includes major improvements based on comprehensive crypto market research:
 
-### 📈 25+ Cryptocurrencies Across 10 Market Sectors
+### 📈 27 Cryptocurrencies Across 10 Market Sectors
 | Sector | Tokens |
 |--------|--------|
 | **Layer 1** | BTC, ETH, SOL, ADA, AVAX, NEAR, SUI |

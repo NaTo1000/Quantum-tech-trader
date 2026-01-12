@@ -4,7 +4,7 @@
 ⚠️  WARNING: USE AT YOUR OWN RISK! ⚠️
 
 An advanced quantum-inspired cryptocurrency trading system with:
-- 25+ cryptocurrencies across multiple market sectors
+- 27 cryptocurrencies across multiple market sectors
 - Major exchange simulation (Binance, Coinbase, Kraken, OKX, etc.)
 - Technical indicators (RSI, MACD, Bollinger Bands)
 - Advanced trading strategies with market sentiment analysis
@@ -218,7 +218,7 @@ class QuantumCryptoTraderV2:
     Advanced Quantum-Inspired Crypto Trading System V2
     
     Features:
-    - 25+ cryptocurrencies across 10 market sectors
+    - 27 cryptocurrencies across 10 market sectors
     - Multi-exchange simulation (Binance, Coinbase, Kraken, etc.)
     - Technical analysis: RSI, MACD, Bollinger Bands
     - Quantum-inspired decision making
@@ -1036,7 +1036,7 @@ def main():
     ║  💀 SIMULATED TRADING ONLY - NO REAL MONEY! 💀                           ║
     ║                                                                           ║
     ║  Features:                                                                ║
-    ║  • 25+ cryptocurrencies across 10 market sectors                          ║
+    ║  • 27 cryptocurrencies across 10 market sectors                           ║
     ║  • Multi-exchange simulation (Binance, Coinbase, Kraken, etc.)            ║
     ║  • Technical analysis: RSI, MACD, Bollinger Bands                         ║
     ║  • Advanced risk management & position sizing                             ║
