@@ -74,8 +74,8 @@ class TestTradeExecution:
         
         trader.run_simulation(cycles=5)
         
-        # Should have some trades with reasonable chaos level
-        assert len(trader.trade_history) >= 0, "Trade history should exist"
+        # Trade history should be a list
+        assert isinstance(trader.trade_history, list), "Trade history should be a list"
         
         # Verify trade structure
         for trade in trader.trade_history:
@@ -157,15 +157,17 @@ class TestSimulationParameters:
         """Cycles are clamped to [1, 100]."""
         trader = QuantumCryptoTrader(chaos_level=0.5, seed=42, silent=True)
         
-        # Test clamping
+        # Test clamping to minimum (negative should become 1)
         results1 = trader.run_simulation(cycles=-5)
-        # Should clamp to 1, verify it ran at least once
-        assert len(trader.trade_history) >= 0
+        # Should have run at least 1 cycle (trade history is a list)
+        assert isinstance(trader.trade_history, list), "Trade history should be valid after clamped cycles"
         
-        # Reset trader
+        # Reset trader and test clamping to maximum
         trader = QuantumCryptoTrader(chaos_level=0.5, seed=42, silent=True)
         results2 = trader.run_simulation(cycles=150)
-        # Should clamp to 100, not crash
+        # Should clamp to 100, not crash - verify results structure is valid
+        assert 'final_cash' in results2, "Results should be valid after clamped cycles"
+        assert isinstance(results2['total_trades'], int), "Total trades should be an integer"
 
 
 class TestResultsAndPersistence:
