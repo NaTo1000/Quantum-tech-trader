@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quantum-trader
+  labels:
+    app: quantum-trader
+    component: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: quantum-trader
+      component: api
+  template:
+    metadata:
+      labels:
+        app: quantum-trader
+        component: api
+    spec:
+      containers:
+      - name: quantum-trader
+        image: quantum-trader:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 2
+        volumeMounts:
+        - name: trade-history
+          mountPath: /app/data
+      volumes:
+      - name: trade-history
+        persistentVolumeClaim:
+          claimName: quantum-trader-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: quantum-trader-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  # storageClassName: standard  # Uncomment and adjust for your cloud provider

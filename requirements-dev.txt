@@ -1,0 +1,15 @@
+# Quantum Tech Trader - Development Dependencies
+
+# Testing
+pytest==7.4.4
+pytest-cov==4.1.0
+pytest-asyncio==0.23.3
+httpx==0.26.0  # For testing FastAPI
+
+# Code quality
+black==24.1.1
+flake8==7.0.0
+mypy==1.8.0
+
+# Development tools
+ipython==8.20.0
