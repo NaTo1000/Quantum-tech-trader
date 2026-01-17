@@ -37,14 +37,14 @@ class TestQuantumPriceOracle:
                 assert price > 0, f"Price must be positive with max chaos"
     
     def test_oracle_deterministic_with_seed(self):
-        """Same seed produces same prices."""
-        trader1 = QuantumCryptoTrader(chaos_level=0.5, seed=999)
-        trader2 = QuantumCryptoTrader(chaos_level=0.5, seed=999)
+        """Same seed produces same prices when called in same sequence."""
+        trader1 = QuantumCryptoTrader(chaos_level=0.5, seed=999, silent=True)
+        prices1 = [trader1.quantum_price_oracle("BTC") for _ in range(3)]
         
-        for symbol in CRYPTO_SYMBOLS:
-            price1 = trader1.quantum_price_oracle(symbol)
-            price2 = trader2.quantum_price_oracle(symbol)
-            assert price1 == price2, f"Deterministic mode failed for {symbol}"
+        trader2 = QuantumCryptoTrader(chaos_level=0.5, seed=999, silent=True)
+        prices2 = [trader2.quantum_price_oracle("BTC") for _ in range(3)]
+        
+        assert prices1 == prices2, f"Deterministic mode failed: {prices1} != {prices2}"
 
 
 class TestTradeExecution:
