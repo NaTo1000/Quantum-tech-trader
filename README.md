@@ -47,6 +47,26 @@ pip install -r requirements.txt
 pip install -r requirements-dev.txt
 ```
 
+## 🔄 Migration from v1.x
+
+**The original interactive script (`quantum_trader.py`) still works!** It has been preserved for backward compatibility.
+
+```bash
+# Old way (still works)
+python quantum_trader.py
+
+# New way (non-interactive, production-ready)
+python -m src.quantum_trader.cli --chaos-level 0.8 --cycles 5
+```
+
+**Key differences:**
+- ✅ Old script preserved as-is for compatibility
+- ✅ New package structure under `src/quantum_trader/`
+- ✅ Non-interactive CLI with argparse
+- ✅ FastAPI service for programmatic access
+- ✅ Docker and Kubernetes support
+- ✅ All original functionality maintained
+
 ## 🎮 Four Working Modes
 
 ### 1. CLI Mode (Non-Interactive)
