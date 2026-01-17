@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  quantum-trader-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: quantum-trader:latest
+    container_name: quantum-trader-api
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount data directory for persistent trade history
+      - ./data:/app/data
+    environment:
+      # Optional environment variables
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz').read()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Optional: CLI runner (one-shot)
+  quantum-trader-cli:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: quantum-trader:latest
+    container_name: quantum-trader-cli
+    volumes:
+      - ./data:/app/data
+    command: ["python", "-m", "src.quantum_trader.cli", "--chaos-level", "0.7", "--cycles", "5"]
+    profiles:
+      - cli  # Only runs when explicitly started with --profile cli
+
+  # Optional: Scheduler (continuous)
+  quantum-trader-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: quantum-trader:latest
+    container_name: quantum-trader-scheduler
+    volumes:
+      - ./data:/app/data
+    command: ["python", "-m", "src.quantum_trader.scheduler", "--interval", "3600", "--chaos-level", "0.6"]
+    restart: unless-stopped
+    profiles:
+      - scheduler  # Only runs when explicitly started with --profile scheduler
+
+# Volume definition (optional, can use bind mounts as above)
+volumes:
+  trade-data:
+    driver: local
